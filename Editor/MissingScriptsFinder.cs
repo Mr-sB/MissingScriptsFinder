@@ -57,7 +57,7 @@ public static class MissingScriptsFinder
     public static void FindMissingScriptsInProjectAllScenes()
     {
         BeginSearch(MENU_SEARCH_IN_PROJECT_ALL_SCENES);
-        var paths = AssetDatabase.FindAssets("t:SceneAsset").Select(AssetDatabase.GUIDToAssetPath).ToArray();
+        var paths = AssetDatabase.FindAssets("t:Scene").Select(AssetDatabase.GUIDToAssetPath).ToArray();
         for (int i = 0, count = paths.Length; i < count; i++)
             SearchInScene(paths[i], i, count);
         EndSearch();
@@ -135,7 +135,7 @@ public static class MissingScriptsFinder
     private static HashSet<string> FindAllScriptAndDllGUIDs()
     {
         //script GUIDs
-        var scriptGUIDs = AssetDatabase.FindAssets("t:MonoScript");
+        var scriptGUIDs = AssetDatabase.FindAssets("t:Script");
         //Project dll GUIDs
         var projectDllGUIDs = Directory.GetFiles("Assets/", "*.dll.meta", SearchOption.AllDirectories)
             .Select(p => File.ReadAllLines(p)[1].Substring(6)).Where(s => !string.IsNullOrEmpty(s));
