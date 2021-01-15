@@ -136,16 +136,18 @@ public static class MissingScriptsFinder
     {
         //script GUIDs
         var scriptGUIDs = AssetDatabase.FindAssets("t:Script");
-        //Project dll GUIDs
-        var projectDllGUIDs = Directory.GetFiles("Assets/", "*.dll.meta", SearchOption.AllDirectories)
-            .Select(p => File.ReadAllLines(p)[1].Substring(6)).Where(s => !string.IsNullOrEmpty(s));
+        
+        //No need. All MonoBehaviour scripts guid are include in scriptGUIDs.
+        // //Project dll GUIDs
+        // var projectDllGUIDs = Directory.GetFiles("Assets/", "*.dll.meta", SearchOption.AllDirectories)
+        //     .Select(p => File.ReadAllLines(p)[1].Substring(6)).Where(s => !string.IsNullOrEmpty(s));
         
         //No need
-        //App dll GUIDs
+        // //App dll GUIDs
         // var appDllGUIDs = Directory.GetFiles(EditorApplication.applicationContentsPath, "*.dll", SearchOption.AllDirectories)
         //     .Select(p => AssetDatabase.AssetPathToGUID(p.Replace('\\', '/'))).Where(s => !string.IsNullOrEmpty(s));
         
-        return new HashSet<string>(scriptGUIDs.Concat(projectDllGUIDs)/*.Concat(appDllGUIDs)*/);
+        return new HashSet<string>(scriptGUIDs/*.Concat(projectDllGUIDs).Concat(appDllGUIDs)*/);
     }
     
     private static Dictionary<string, HashSet<string>> FindAllPrefabScriptsRef()
