@@ -80,13 +80,16 @@ public static class MissingScriptsFinder
             }
         }
         
-        Debug.Log("Missing script prefabs count: "  + missingScriptPrefabs.Count);
+        //Maybe not missing.
+        int notMissingCount = 0;
         missingScriptPrefabs.ForEachIndex((path, index, count) =>
         {
             EditorUtility.DisplayProgressBar("Check missing script prefabs", path, (float)index / count);
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-            FindMissingScriptsInGo(prefab, false);
+            if (!FindMissingScriptsInGo(prefab, false))
+                notMissingCount++;
         });
+        Debug.Log("Missing script prefabs count: "  + (missingScriptPrefabs.Count - notMissingCount));
         EndSearch();
     }
 
@@ -181,14 +184,16 @@ public static class MissingScriptsFinder
         return references;
     }
 
-    private static void FindMissingScriptsInGo(GameObject go, bool needSceneRemove)
+    private static bool FindMissingScriptsInGo(GameObject go, bool needSceneRemove)
     {
-        var components = go.GetComponents<MonoBehaviour>();
+        var components = go.GetComponents<Component>();
         var transform = go.transform;
+        bool missing = false;
         foreach (var c in components)
         {
             // Missing components will be null, we can't find their type, etc.
             if (c) continue;
+            missing = true;
             var assetPath =  AssetDatabase.GetAssetPath(go);
             //prefab
             if (!string.IsNullOrEmpty(assetPath))
@@ -208,7 +213,8 @@ public static class MissingScriptsFinder
 
         //Find children
         for (int i = 0, childCount = transform.childCount; i < childCount; i++)
-            FindMissingScriptsInGo(transform.GetChild(i).gameObject, needSceneRemove);
+            missing |= FindMissingScriptsInGo(transform.GetChild(i).gameObject, needSceneRemove);
+        return missing;
     }
 
     private static readonly Regex mScriptGUIDRegex = new Regex(@"m_Script: \{fileID: [0-9]+, guid: ([0-9a-f]{32}), type: 3\}");
